@@ -1,0 +1,36 @@
+name: Build Backend and Frontend
+
+on:
+  pull_request:
+    branches:
+      - main
+      
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build All Projects
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - SampleApp/BackEnd/BackEnd.csproj
+          - SampleApp/FrontEnd/FrontEnd.csproj
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ matrix.project }}
+
+      - name: Build project
+        run: dotnet build ${{ matrix.project }} --no-restore --configuration Release
